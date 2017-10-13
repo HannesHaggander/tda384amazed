@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <code>ForkJoinSolver</code> implements a solver for
@@ -19,10 +20,6 @@ import java.util.concurrent.ForkJoinTask;
 
 public class ForkJoinSolver extends SequentialSolver
 {
-    public ForkJoinSolver mForkJoinSolver;
-    public static ForkJoinPool mForkJoinPool;
-    public ForkJoinTask<List<Integer>> mFork;
-
     /**
      * Creates a solver that searches in <code>maze</code> from the
      * start node to a goal.
@@ -32,8 +29,6 @@ public class ForkJoinSolver extends SequentialSolver
     public ForkJoinSolver(Maze maze)
     {
         super(maze);
-        if(mForkJoinPool == null){ mForkJoinPool = new ForkJoinPool(); }
-        mForkJoinSolver = this;
     }
 
     /**
@@ -69,76 +64,62 @@ public class ForkJoinSolver extends SequentialSolver
         return parallelDepthFirstSearch();
     }
 
+    ForkJoinPool mForkPool = new ForkJoinPool();
     private List<Integer> parallelDepthFirstSearch() {
-        // one player active on the maze at start
-        int player = maze.newPlayer(start);
-        // start with start node
+
+        int _spawnedPlayer = maze.newPlayer(this.start);
         frontier.push(start);
-        // as long as not all nodes have been processed
-        while (!frontier.empty()) {
-            // get the new node to process
-            int current = frontier.pop();
-            // if current node has a goal
-            if (maze.hasGoal(current)) {
-                // move player to goal
-                maze.move(player, current);
-                mFork.join();
-                mForkJoinPool.shutdown();
-                // search finished: reconstruct and return path
-                return pathFromTo(start, current);
+        int currentPos = -1;
+
+        while(!frontier.isEmpty()){
+            currentPos = frontier.pop();
+
+            if(maze.hasGoal(currentPos)){
+                print(">Found goal");
+                maze.move(_spawnedPlayer, currentPos);
+                join();
+                return pathFromTo(start, currentPos);
             }
-            // if current node has not been visited yet
-            if (!visited.contains(current)){
-                // mark node as visited
-                visited.add(current);
-                // for every node nb adjacent to current
-                Set<Integer> tmpNeighbours = maze.neighbors(current);
-                if(tmpNeighbours.isEmpty()){
-                    print("no possible neighbour");
-                }
-                else {
-                    for (int nb: tmpNeighbours) {
-                        // add nb to the nodes to be processed
-                        frontier.push(nb);
-                        // if nb has not been already visited,
-                        // nb can be reached from current (i.e., current is nb's predecessor)
-                        if (!visited.contains(nb))
-                            predecessor.put(nb, current);
-                        if (tmpNeighbours.size() == 1) {
-                            print("move player to " + current);
-                            maze.move(player, current);
-                        } else {
-                            delayDebug(250);
-                            print("fork player - start at: " + nb);
-                            ForkJoinSolver tmpInstance = newFork(nb);
-                            mFork = tmpInstance.fork();
-                            mForkJoinPool.submit(mFork);
-                        }
-                    }
+
+            if(visited.contains(currentPos)){
+                print("!Already visited: " + currentPos);
+                //awaitTermination();
+                continue;
+            }
+
+            Set<Integer> tmpNeighbours = maze.neighbors(currentPos);
+
+            if(tmpNeighbours.isEmpty()){
+                print("No neighbours to: " + tmpNeighbours);
+                join();
+                awaitTermination();
+            }
+
+            if(tmpNeighbours.size() > 2){
+                print("more than two neighbours");
+                for(int neighbour : tmpNeighbours){
+                    print("\t> All neighbour: " + neighbour);
+                    frontier.push(neighbour);
+                    if(!visited.contains(neighbour)){ predecessor.put(neighbour, currentPos); }
+                    visited.add(neighbour);
+                    mForkPool.submit(fork());
                 }
             }
+            else {
+                print("only one neighbour, move to neighbour");
+                maze.move(_spawnedPlayer, currentPos);
+                if(!visited.contains(currentPos)){ predecessor.put(tmpNeighbours.iterator().next(), currentPos); }
+                visited.add(currentPos);
+
+            }
         }
-        while(mForkJoinPool.getRunningThreadCount() > 0){
-            delayDebug(100);
-        }
+
         return null;
     }
 
-    private void delayDebug(int delayMS){
-        try{
-            Thread.sleep(delayMS);
-        }
-        catch (Exception ex){
-
-        }
-    }
-
-    private ForkJoinSolver newFork(int startAt){
-        ForkJoinSolver tmpForkJoinSolver = new ForkJoinSolver(maze);
-        tmpForkJoinSolver.predecessor = this.predecessor;
-        tmpForkJoinSolver.visited = this.visited;
-        tmpForkJoinSolver.start = startAt;
-        return tmpForkJoinSolver;
+    private void awaitTermination(){
+        try{ mForkPool.awaitTermination(60 , TimeUnit.SECONDS); }
+        catch (Exception ex){ err("Failed to wait termination", ex); }
     }
 
     /**
@@ -148,4 +129,6 @@ public class ForkJoinSolver extends SequentialSolver
     private void print(final String aText){
         System.out.println(aText);
     }
+
+    private void err(final String aText, Exception ex){ System.err.println(aText + "\n" + ex.toString());}
 }
