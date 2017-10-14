@@ -78,7 +78,7 @@ public class Main
         long stop = System.currentTimeMillis();
         long elapsed = stop - start;
         System.out.println("Solving time: " + elapsed + " ms");
-        Thread.sleep(1000);
+        Thread.sleep(2500);
         amazed.showSolution();
     }
 }

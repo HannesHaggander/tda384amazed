@@ -75,45 +75,46 @@ public class ForkJoinSolver extends SequentialSolver
             currentPos = frontier.pop();
 
             if(maze.hasGoal(currentPos)){
-                print(">Found goal");
                 maze.move(_spawnedPlayer, currentPos);
                 join();
+                mForkPool.shutdown();
+                print("found goal!");
                 return pathFromTo(start, currentPos);
             }
 
-            if(visited.contains(currentPos)){
-                print("!Already visited: " + currentPos);
-                //awaitTermination();
-                continue;
-            }
-
-            Set<Integer> tmpNeighbours = maze.neighbors(currentPos);
-
-            if(tmpNeighbours.isEmpty()){
-                print("No neighbours to: " + tmpNeighbours);
-                join();
-                awaitTermination();
-            }
-
-            if(tmpNeighbours.size() > 2){
-                print("more than two neighbours");
-                for(int neighbour : tmpNeighbours){
-                    print("\t> All neighbour: " + neighbour);
-                    frontier.push(neighbour);
-                    if(!visited.contains(neighbour)){ predecessor.put(neighbour, currentPos); }
-                    visited.add(neighbour);
-                    mForkPool.submit(fork());
-                }
-            }
-            else {
-                print("only one neighbour, move to neighbour");
-                maze.move(_spawnedPlayer, currentPos);
-                if(!visited.contains(currentPos)){ predecessor.put(tmpNeighbours.iterator().next(), currentPos); }
+            if(!visited.contains(currentPos)){
                 visited.add(currentPos);
+                maze.move(_spawnedPlayer, currentPos);
+                Set<Integer> tmpNeighbours = maze.neighbors(currentPos);
 
+                if(tmpNeighbours.isEmpty()){
+                    print("no neighbours");
+                    awaitTermination();
+                }
+                if(tmpNeighbours.size() > 1){
+                    //more than one neighbours
+                    for(int neighbour : tmpNeighbours){
+                        if(visited.contains(neighbour)){
+                            continue;
+                        }
+                        frontier.add(neighbour);
+                        predecessor.put(neighbour, currentPos);
+                        mForkPool.submit(fork());
+                    }
+                }
+                else {
+                    //only one neighbour
+                    int onlyNeighbour = tmpNeighbours.iterator().next();
+                    if(!visited.contains(onlyNeighbour)){
+                        frontier.add(onlyNeighbour);
+                        predecessor.put(onlyNeighbour, currentPos);
+                        maze.move(_spawnedPlayer, onlyNeighbour);
+                    }
+                }
             }
         }
 
+        awaitTermination();
         return null;
     }
 
