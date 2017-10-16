@@ -64,108 +64,76 @@ public class ForkJoinSolver extends SequentialSolver
         return parallelDepthFirstSearch();
     }
 
-    ForkJoinPool mForkPool = new ForkJoinPool();
+    public static List<ForkJoinTask<List<Integer>>> allForks = null;
     private List<Integer> parallelDepthFirstSearch() {
-        print("parallelDepthFirstSearch");
+        if(allForks == null){ allForks = new ArrayList<>(); }
         int _spawnedPlayer = maze.newPlayer(this.start);
         frontier.push(start);
-        int currentPos = -1;
+        if(!visited.contains(start)){ visited.add(start); }
+        int currentPos;
 
-        print(String.format("Spawning player {0} at pos {1}" +
-                "\tVisited Nodes: {2}" +
-                "\tPred nodes: {3}",
-                _spawnedPlayer,
-                start,
-                visited.size(),
-                predecessor.size()
-        ));
+        //print(String.format("Spawning new player at {0} at pos {1}", _spawnedPlayer, start));
 
         while(!frontier.isEmpty()){
             currentPos = frontier.pop();
+
+            // found goal
             if(maze.hasGoal(currentPos)){
+                visited.add(currentPos);
                 maze.move(_spawnedPlayer, currentPos);
+                ForkJoinPool.commonPool().shutdown();
+                print("Found goal!");
                 return pathFromTo(start, currentPos);
             }
 
-            for (int nbr : maze.neighbors(currentPos)){
-                if(visited.contains(nbr)){ continue; }
-                frontier.push(nbr);
-                visited.add(nbr);
-                predecessor.put(nbr, currentPos);
-                maze.move(_spawnedPlayer, nbr);
-                mForkPool.submit(fork());
+            Set<Integer> currentNeighbours = maze.neighbors(currentPos);
+            if(currentNeighbours.isEmpty()){
+                continue;
+            }
+            else if(currentNeighbours.size() == 1) {
+                int neighbourNode = currentNeighbours.iterator().next();
+                if(visited.contains(neighbourNode)){ continue; }
+                visited.add(currentPos);
+                predecessor.put(neighbourNode, currentPos);
+                maze.move(_spawnedPlayer, currentPos);
+                continue;
+            }
+            else {
+                //print("Multiple neighbours: " + currentNeighbours.size());
+                Set<Integer> nonVisit = new HashSet<>();
+                for(int neighbour : currentNeighbours){
+                    if(visited.contains(neighbour)){ continue; }
+                    frontier.push(neighbour);
+                    visited.add(neighbour);
+                    predecessor.put(neighbour, currentPos);
+                    nonVisit.add(neighbour);
+                }
+
+                for (int noVisit : nonVisit){
+                    makeNewPlayer(noVisit);
+                }
+
             }
         }
-
+        join();
         return null;
     }
 
-    /**
-     *
-     * @param aPlayerID
-     * @param aCurrentPosition
-     * @return
-     */
-    private boolean isCurrentGoal(int aPlayerID, int aCurrentPosition){
-        if(maze.hasGoal(aCurrentPosition)){
-            maze.move(aPlayerID, aCurrentPosition);
-            mForkPool.shutdown();
-            return true;
-        }
-        return false;
-    }
+    private void makeNewPlayer(int pos){
+        try { Thread.sleep(1000); }
+        catch (Exception ex){}
 
-    /**
-     *
-     * @param playerId
-     * @param aCurrentPosition
-     */
-    private void checkNeighbours(int playerId, int aCurrentPosition){
-        if(visited.contains(aCurrentPosition)){
-            print("Already contains: " + aCurrentPosition);
-            awaitTermination();
-            return;
+        print("Make new player");
+        ForkJoinSolver tmpSolver = new ForkJoinSolver(maze);
+        tmpSolver.predecessor = this.predecessor;
+        tmpSolver.visited = this.visited;
+        tmpSolver.frontier = this.frontier;
+        tmpSolver.start = pos;
+        ForkJoinTask<List<Integer>> tmpFork = tmpSolver.fork();
+        if(!allForks.contains(tmpFork)){
+            allForks.add(tmpFork);
+            ForkJoinPool.commonPool().invoke(tmpFork);
         }
-
-        Set<Integer> tmpNeighbours = maze.neighbors(aCurrentPosition);
-        if(tmpNeighbours.isEmpty()){
-            print("No neighbours");
-            return;
-        }
-        else if(tmpNeighbours.size() > 1){ handleMultipleNeighbours(tmpNeighbours, aCurrentPosition); }
-        else { handleSingleNeighbour(playerId, tmpNeighbours.iterator().next(), aCurrentPosition); }
-    }
-
-    /**
-     *
-     * @param aNeighbours
-     * @param aCurrentPosition
-     */
-    private void handleMultipleNeighbours(Set<Integer> aNeighbours, int aCurrentPosition){
-        print("More than one neighbour");
-        Set<Integer> notVisited = new HashSet<>();
-        for(int nbr : aNeighbours){
-            if(!visited.contains(nbr)){
-                frontier.push(nbr);
-                notVisited.add(nbr);
-            }
-        }
-        for(int nbr : notVisited){
-            start = nbr;
-            predecessor.put(nbr, aCurrentPosition);
-            mForkPool.submit(fork());
-        }
-    }
-
-    private void handleSingleNeighbour(int aPlayerId, int aNeighbour, int aCurrent){
-        print("only one neighbour");
-        predecessor.put(aNeighbour, aCurrent);
-        maze.move(aPlayerId, aNeighbour);
-    }
-
-    private void awaitTermination(){
-        try{ mForkPool.awaitTermination(60 , TimeUnit.SECONDS); }
-        catch (Exception ex){ err("Failed to wait termination", ex); }
     }
 
     /**
