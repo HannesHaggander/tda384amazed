@@ -3,10 +3,7 @@ package amazed.solver;
 import amazed.maze.Maze;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * <code>ForkJoinSolver</code> implements a solver for
@@ -64,76 +61,120 @@ public class ForkJoinSolver extends SequentialSolver
         return parallelDepthFirstSearch();
     }
 
-    public static List<ForkJoinTask<List<Integer>>> allForks = null;
+    List<SequentialSolver> forks = new LinkedList<>();
+    int _spawnedPlayer;
     private List<Integer> parallelDepthFirstSearch() {
-        if(allForks == null){ allForks = new ArrayList<>(); }
-        int _spawnedPlayer = maze.newPlayer(this.start);
+        _spawnedPlayer = maze.newPlayer(this.start);
         frontier.push(start);
         if(!visited.contains(start)){ visited.add(start); }
         int currentPos;
-
-        //print(String.format("Spawning new player at {0} at pos {1}", _spawnedPlayer, start));
+        print(String.format("Starting new player on %s", start));
 
         while(!frontier.isEmpty()){
             currentPos = frontier.pop();
-
             // found goal
             if(maze.hasGoal(currentPos)){
                 visited.add(currentPos);
                 maze.move(_spawnedPlayer, currentPos);
-                ForkJoinPool.commonPool().shutdown();
-                print("Found goal!");
+                print("Goal is: " + currentPos + " start was: " + start);
+                StringBuilder sb = new StringBuilder();
+                sb.append("Found goal! Path: ");
+                sb.append("[Length " + predecessor.keySet().size() + "] ");
+                sb.append("\n\tFrom end: ");
+                int goalcurrent = currentPos;
+                while(predecessor.get(goalcurrent) != null){
+                    goalcurrent = predecessor.get(goalcurrent);
+                    sb.append(goalcurrent + " -> ");
+                }
+
+                sb.append("\n\tFrom start: ");
+                goalcurrent = start;
+                while(predecessor.get(goalcurrent) != null){
+                    goalcurrent = predecessor.get(goalcurrent);
+                    sb.append(goalcurrent + " -> ");
+                }
+                sb.append(String.format("\nList contains start: %s | contains end: %s",
+                        predecessor.get(start) != null,
+                        predecessor.get(currentPos) != null
+                ));
+                print(sb.toString());
+
                 return pathFromTo(start, currentPos);
             }
 
             Set<Integer> currentNeighbours = maze.neighbors(currentPos);
-            if(currentNeighbours.isEmpty()){
-                continue;
+            Set<Integer> nonVisited = new ConcurrentSkipListSet<>();
+
+            for(int neighbour : currentNeighbours){
+                if(visited.contains(neighbour)){ continue; }
+                visited.add(neighbour);
+                frontier.push(neighbour);
+                nonVisited.add(neighbour);
             }
-            else if(currentNeighbours.size() == 1) {
-                int neighbourNode = currentNeighbours.iterator().next();
-                if(visited.contains(neighbourNode)){ continue; }
-                visited.add(currentPos);
-                predecessor.put(neighbourNode, currentPos);
-                maze.move(_spawnedPlayer, currentPos);
-                continue;
+
+            forks.clear();
+            for (int noVisit : nonVisited){
+                ForkJoinSolver tmpSolver = new ForkJoinSolver(maze);
+                tmpSolver.start = noVisit;
+                tmpSolver.visited = this.visited;
+                tmpSolver.predecessor = this.predecessor;
+                tmpSolver.predecessor.put(noVisit, currentPos);
+                tmpSolver.frontier = this.frontier;
+                forks.add(tmpSolver);
+                tmpSolver.fork();
             }
-            else {
-                //print("Multiple neighbours: " + currentNeighbours.size());
-                Set<Integer> nonVisit = new HashSet<>();
-                for(int neighbour : currentNeighbours){
-                    if(visited.contains(neighbour)){ continue; }
-                    frontier.push(neighbour);
-                    visited.add(neighbour);
-                    predecessor.put(neighbour, currentPos);
-                    nonVisit.add(neighbour);
+
+            for(SequentialSolver solver : forks){
+                List<Integer> tmpPath = null;
+                try{ tmpPath = solver.join(); }
+                catch (Exception ex){ System.err.println("Failed to get join: " + ex.getLocalizedMessage()); }
+
+                for(int tmpVisited : solver.visited){
+                    if(!this.visited.contains(tmpVisited)){
+                        print(String.format("added %s to visited", tmpVisited));
+                        this.visited.add(tmpVisited);
+                    }
                 }
 
-                for (int noVisit : nonVisit){
-                    makeNewPlayer(noVisit);
+                if(tmpPath != null){
+                    return tmpPath;
                 }
-
             }
         }
-        join();
+
         return null;
     }
 
-    private void makeNewPlayer(int pos){
-        try { Thread.sleep(1000); }
-        catch (Exception ex){}
-
-        print("Make new player");
-        ForkJoinSolver tmpSolver = new ForkJoinSolver(maze);
-        tmpSolver.predecessor = this.predecessor;
-        tmpSolver.visited = this.visited;
-        tmpSolver.frontier = this.frontier;
-        tmpSolver.start = pos;
-        ForkJoinTask<List<Integer>> tmpFork = tmpSolver.fork();
-        if(!allForks.contains(tmpFork)){
-            allForks.add(tmpFork);
-            ForkJoinPool.commonPool().invoke(tmpFork);
+    private boolean isValidPath(int tmpCurrent)
+    {
+        List<Integer> path = new LinkedList<>();
+        Integer current = tmpCurrent;
+        while (current != null) {
+            path.add(current);
+            current = this.predecessor.get(current);
         }
+        Collections.reverse(path);
+
+        if (path.isEmpty()){
+            print("path is empty");
+            return false;
+        }
+        ListIterator<Integer> iter = path.listIterator();
+        int prev = 0, curr = iter.next();
+        if (curr != this.start){
+            print("current is start pos");
+            return false;
+        }
+        while (iter.hasNext()) {
+            prev = curr;
+            curr = iter.next();
+            if (!maze.neighbors(prev).contains(curr)){
+                print("neighbours does to previous does not contain current");
+                return false;
+            }
+        }
+        print("is current goal? " + maze.hasGoal(curr));
+        return maze.hasGoal(curr);
     }
 
     /**
