@@ -63,7 +63,7 @@ public class Main
             printUsageAndExit();
     }
 
-    private static final String sMap = ".\\maps\\small.map";
+    private static final String sMap = ".\\maps\\medium.map";
     private static final boolean sSequential = false;
     private static final int sForkAfter = 1;
     private static final int sPeriodMS = 250;

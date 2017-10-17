@@ -61,14 +61,14 @@ public class ForkJoinSolver extends SequentialSolver
         return parallelDepthFirstSearch();
     }
 
+    public int spawnOn = -1;
     List<SequentialSolver> forks = new LinkedList<>();
     int _spawnedPlayer;
     private List<Integer> parallelDepthFirstSearch() {
-        _spawnedPlayer = maze.newPlayer(this.start);
+        _spawnedPlayer = maze.newPlayer(spawnOn < 0 ? spawnOn : this.start);
         frontier.push(start);
         if(!visited.contains(start)){ visited.add(start); }
         int currentPos;
-        print(String.format("Starting new player on %s", start));
 
         while(!frontier.isEmpty()){
             currentPos = frontier.pop();
@@ -115,7 +115,7 @@ public class ForkJoinSolver extends SequentialSolver
             forks.clear();
             for (int noVisit : nonVisited){
                 ForkJoinSolver tmpSolver = new ForkJoinSolver(maze);
-                tmpSolver.start = noVisit;
+                tmpSolver.spawnOn = noVisit;
                 tmpSolver.visited = this.visited;
                 tmpSolver.predecessor = this.predecessor;
                 tmpSolver.predecessor.put(noVisit, currentPos);
