@@ -86,17 +86,6 @@ public class ForkJoinSolver extends SequentialSolver
                     goalcurrent = predecessor.get(goalcurrent);
                     sb.append(goalcurrent + " -> ");
                 }
-
-                sb.append("\n\tFrom start: ");
-                goalcurrent = start;
-                while(predecessor.get(goalcurrent) != null){
-                    goalcurrent = predecessor.get(goalcurrent);
-                    sb.append(goalcurrent + " -> ");
-                }
-                sb.append(String.format("\nList contains start: %s | contains end: %s",
-                        predecessor.get(start) != null,
-                        predecessor.get(currentPos) != null
-                ));
                 print(sb.toString());
 
                 return pathFromTo(start, currentPos);
@@ -104,6 +93,16 @@ public class ForkJoinSolver extends SequentialSolver
 
             Set<Integer> currentNeighbours = maze.neighbors(currentPos);
             Set<Integer> nonVisited = new ConcurrentSkipListSet<>();
+
+            if(currentNeighbours.isEmpty()){ continue; }
+            if(currentNeighbours.size() == 1){
+                int onlyNeighbour = currentNeighbours.iterator().next();
+                visited.add(onlyNeighbour);
+                frontier.add(onlyNeighbour);
+                predecessor.put(onlyNeighbour, currentPos);
+                maze.move(_spawnedPlayer, onlyNeighbour);
+                continue;
+            }
 
             for(int neighbour : currentNeighbours){
                 if(visited.contains(neighbour)){ continue; }
