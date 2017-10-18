@@ -82,6 +82,7 @@ public class ForkJoinSolver extends SequentialSolver
                 sb.append("[Length " + predecessor.keySet().size() + "] ");
                 sb.append("\n\tFrom end: ");
                 int goalcurrent = currentPos;
+                ForkJoinPool.commonPool().shutdown();
                 while(predecessor.get(goalcurrent) != null){
                     goalcurrent = predecessor.get(goalcurrent);
                     sb.append(goalcurrent + " -> ");
@@ -121,7 +122,7 @@ public class ForkJoinSolver extends SequentialSolver
                 tmpSolver.predecessor.put(noVisit, currentPos);
                 tmpSolver.frontier = this.frontier;
                 forks.add(tmpSolver);
-                tmpSolver.fork();
+                ForkJoinPool.commonPool().submit(tmpSolver.fork());
             }
 
             // join all forks and parse their result.
