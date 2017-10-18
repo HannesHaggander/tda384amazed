@@ -1,0 +1,7 @@
+Amazed Description
+
+The solution handles nodes with one neighbour and multiple neighbours differently. 
+Should a node only have one neighbour the player will move to the next node without any multiprocessing work. 
+Nodes with multiple available neighbours that has not been visited are handled by making a new instance of the ForkJoinSolver then forking it for results. The new fork can possibly spawn even more forks depending on the neighbours to the new position. 
+All forks are then joined together and they syncronize their result. 
+If a fork return a list that is not null then the goal has been found and the fork that found the goal will travel up the fork hierarchy until the original top level ForkJoinSolver returns the path.
