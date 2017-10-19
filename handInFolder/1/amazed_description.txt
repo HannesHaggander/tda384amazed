@@ -1,6 +1,4 @@
-Amazed Description 
-Hannes Häggander
-Fire Group 65
+Amazed Description
 
 In every step of the program only the available nodes are considered when making a computation. Available neighbour nodes are defined by bordering to the current node in addition to that the node not been visited, yet.
 
@@ -11,4 +9,4 @@ If the current position node only has one available neighbour the player will mo
 When multiple available neighbouring nodes are found; a new instance of the ForkJoinSolver is created and values are passed along to the new instance to prevent repetition. The new instance is then forked into the ForkJoinPools common pool to allow worker stealing. The new fork will most likely spawn new forks thus creating a hierarchy of ForkJoinSolver forks.
 Once all neighbours have been handled and instances have been forked, all forks are then joined together to syncronize their results. 
 
-A fork that return a list that is not null indicates the goal has been found and the fork that found the goal will continously travel up the fork hierarchy until the top level ForkJoinSolver has been reached and the goal will be returned as path from start to goal.
+A fork that return a list that is not null indicates the goal has been found and the fork that found the goal will continously travel up the fork hierarchy until the top level ForkJoinSolver has been reached and the goal will be returned as path from start to stop.
