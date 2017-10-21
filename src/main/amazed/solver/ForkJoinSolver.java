@@ -30,11 +30,11 @@ public class ForkJoinSolver extends SequentialSolver
 
     /**
      * Creates a solver that searches in <code>maze</code> from the
-     * start node to a goal, forking after a given number of visited
+     * start node to a goal, forking after a given number of visitedNodes
      * nodes.
      *
      * @param maze        the maze to be searched
-     * @param forkAfter   the number of steps (visited nodes) after
+     * @param forkAfter   the number of steps (visitedNodes nodes) after
      *                    which a parallel task is forked; if
      *                    <code>forkAfter &lt;= 0</code> the solver never
      *                    forks new tasks
@@ -61,91 +61,83 @@ public class ForkJoinSolver extends SequentialSolver
         return parallelDepthFirstSearch();
     }
 
-    public int spawnOn = -1;
-    List<SequentialSolver> forks = new LinkedList<>();
-    int _spawnedPlayer;
+    int playerID;
+    int currentPosition;
+    int moveTo = -1;
+    int startPos;
+
+    public static ConcurrentSkipListSet<Integer> visitedList = null;
+
     private List<Integer> parallelDepthFirstSearch() {
-        // start player on start on instead of start if initiated
-        _spawnedPlayer = maze.newPlayer(spawnOn < 0 ? spawnOn : this.start);
-        frontier.push(start);
-        if(!visited.contains(start)){ visited.add(start); }
-        int currentPos;
-
+        startPos = moveTo > 0 ? moveTo : start;
+        if(maze.hasGoal(start)){
+            print("Start pos is goal");
+            List<Integer> tmpList = new ArrayList<>();
+            tmpList.add(start);
+            return tmpList;
+        }
+        if(getVisited().contains(startPos)){ return null; }
+        playerID = maze.newPlayer(startPos);
+        addToVisited(startPos);
+        if(frontier.isEmpty()){ frontier.push(startPos); }
         while(!frontier.isEmpty()){
-            currentPos = frontier.pop();
-            // found goal
-            if(maze.hasGoal(currentPos)){
-                visited.add(currentPos);
-                maze.move(_spawnedPlayer, currentPos);
-                StringBuilder sb = new StringBuilder();
-                sb.append("Found goal! Path: ");
-                sb.append("[Length " + predecessor.keySet().size() + "] ");
-                sb.append("\n\tFrom end: ");
-                int goalcurrent = currentPos;
-                ForkJoinPool.commonPool().shutdown();
-                while(predecessor.get(goalcurrent) != null){
-                    goalcurrent = predecessor.get(goalcurrent);
-                    sb.append(goalcurrent + " -> ");
+            currentPosition = frontier.pop();
+
+            if(maze.hasGoal(currentPosition)){
+                print("\t\t\t>>>>Found goal!");
+                maze.move(playerID, currentPosition);
+                return pathFromTo(start, currentPosition);
+            }
+
+            Set<Integer> tmpNeighbour = maze.neighbors(currentPosition);
+            StringBuilder sb = new StringBuilder();
+            sb.append(String.format("At pos %s -> Neighbour size: %s\tNeighbours: ",
+                    currentPosition,
+                    (tmpNeighbour != null ? tmpNeighbour.size() : "null")
+            ));
+            print(sb.toString());
+            for(int neighbour : tmpNeighbour){
+                List<ForkJoinSolver> tmpFork = new ArrayList<>();
+                if(!getVisited().contains(neighbour)){
+                    frontier.push(neighbour);
+                    addToVisited(neighbour);
+                    predecessor.put(neighbour, currentPosition);
+                    ForkJoinSolver tmpSolver = new ForkJoinSolver(maze);
+                    tmpSolver.moveTo = neighbour;
+                    tmpFork.add(tmpSolver);
+                    tmpSolver.fork();
+                    tmpSolver.compute();
                 }
-                print(sb.toString().substring(0, sb.toString().length()-3));
-
-                return pathFromTo(start, currentPos);
-            }
-
-            Set<Integer> currentNeighbours = maze.neighbors(currentPos);
-            Set<Integer> nonVisited = new ConcurrentSkipListSet<>();
-
-            //handle single neighbour
-            if(currentNeighbours.size() == 1){
-                int onlyNeighbour = currentNeighbours.iterator().next();
-                visited.add(onlyNeighbour);
-                frontier.add(onlyNeighbour);
-                predecessor.put(onlyNeighbour, currentPos);
-                maze.move(_spawnedPlayer, onlyNeighbour);
-                continue;
-            }
-
-            // handle multiple neighbours. Add all neighbours to visited and frontier prior to forking
-            for(int neighbour : currentNeighbours){
-                if(visited.contains(neighbour)){ continue; }
-                visited.add(neighbour);
-                frontier.push(neighbour);
-                nonVisited.add(neighbour);
-            }
-
-            // make new fork. Set data element pointers. Save instance to get data later
-            for (int noVisit : nonVisited){
-                ForkJoinSolver tmpSolver = new ForkJoinSolver(maze);
-                tmpSolver.spawnOn = noVisit;
-                tmpSolver.visited = this.visited;
-                tmpSolver.predecessor = this.predecessor;
-                tmpSolver.predecessor.put(noVisit, currentPos);
-                tmpSolver.frontier = this.frontier;
-                forks.add(tmpSolver);
-                ForkJoinPool.commonPool().submit(tmpSolver.fork());
-            }
-
-            // join all forks and parse their result.
-            for(SequentialSolver solver : forks){
-                List<Integer> tmpPath = null;
-                try{ tmpPath = solver.join(); }
-                catch (Exception ex){ System.err.println("Failed to get join: " + ex.getLocalizedMessage()); }
-
-                for(int tmpVisited : solver.visited){
-                    if(!this.visited.contains(tmpVisited)){
-                        print(String.format("added %s to visited", tmpVisited));
-                        this.visited.add(tmpVisited);
+                for(ForkJoinSolver fork : tmpFork){
+                    try {
+                        List<Integer> tmpResult = fork.join();
+                        if(tmpResult != null){
+                            print("Path found");
+                            return tmpResult;
+                        }
                     }
-                }
-
-                //if the goal has been found then have all forks return the path
-                if(tmpPath != null){
-                    return tmpPath;
+                    catch (Exception ex){
+                        continue;
+                    }
                 }
             }
         }
 
         return null;
+    }
+
+    private static ConcurrentSkipListSet<Integer> getVisited(){
+        if(visitedList == null){ visitedList = new ConcurrentSkipListSet<>(); }
+        return visitedList;
+    }
+
+    public static boolean addToVisited(int node){
+        getVisited();
+        if(!visitedList.contains(node)){
+            visitedList.add(node);
+            return true;
+        }
+        return false;
     }
 
     private void delay(final long aDelay){

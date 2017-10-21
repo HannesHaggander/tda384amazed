@@ -63,7 +63,8 @@ public class Main
             printUsageAndExit();
     }
 
-    private static final String sMap = ".\\maps\\small.map";
+    private static final String bigMap = ".\\maps\\medium.map";
+    private static final String smallMap = ".\\maps\\small.map";
     private static final boolean sSequential = false;
     private static final int sForkAfter = 1;
     private static final int sPeriodMS = 250;
@@ -72,7 +73,7 @@ public class Main
     throws InterruptedException
     {
         //parseArguments(args);
-        Amazed amazed = new Amazed(sMap, sSequential, sForkAfter, sPeriodMS);
+        Amazed amazed = new Amazed(bigMap, sSequential, sForkAfter, sPeriodMS);
         long start = System.currentTimeMillis();
         amazed.solve();
         long stop = System.currentTimeMillis();

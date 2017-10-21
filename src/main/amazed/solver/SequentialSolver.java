@@ -172,8 +172,10 @@ public class SequentialSolver
         while (current != from) {
             path.add(current);
             current = predecessor.get(current);
-            if (current == null)
+            if (current == null){
+                System.err.println("Current: null");
                 return null;
+            }
         }
         path.add(from);
         Collections.reverse(path);
