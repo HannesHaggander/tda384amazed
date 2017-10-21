@@ -66,36 +66,31 @@ public class ForkJoinSolver extends SequentialSolver
     int moveTo = -1;
     int startPos;
 
+    public static ForkJoinPool sForkPool = null;
     public static ConcurrentSkipListSet<Integer> visitedList = null;
 
     private List<Integer> parallelDepthFirstSearch() {
         startPos = moveTo > 0 ? moveTo : start;
         if(maze.hasGoal(start)){
-            print("Start pos is goal");
             List<Integer> tmpList = new ArrayList<>();
             tmpList.add(start);
             return tmpList;
         }
+
         if(getVisited().contains(startPos)){ return null; }
+
         playerID = maze.newPlayer(startPos);
         addToVisited(startPos);
         if(frontier.isEmpty()){ frontier.push(startPos); }
+
         while(!frontier.isEmpty()){
             currentPosition = frontier.pop();
-
             if(maze.hasGoal(currentPosition)){
-                print("\t\t\t>>>>Found goal!");
-                maze.move(playerID, currentPosition);
+                //maze.move(playerID, currentPosition);
                 return pathFromTo(start, currentPosition);
             }
 
             Set<Integer> tmpNeighbour = maze.neighbors(currentPosition);
-            StringBuilder sb = new StringBuilder();
-            sb.append(String.format("At pos %s -> Neighbour size: %s\tNeighbours: ",
-                    currentPosition,
-                    (tmpNeighbour != null ? tmpNeighbour.size() : "null")
-            ));
-            print(sb.toString());
             for(int neighbour : tmpNeighbour){
                 List<ForkJoinSolver> tmpFork = new ArrayList<>();
                 if(!getVisited().contains(neighbour)){
@@ -105,14 +100,12 @@ public class ForkJoinSolver extends SequentialSolver
                     ForkJoinSolver tmpSolver = new ForkJoinSolver(maze);
                     tmpSolver.moveTo = neighbour;
                     tmpFork.add(tmpSolver);
-                    tmpSolver.fork();
-                    tmpSolver.compute();
+                    addFork(tmpSolver.fork());
                 }
                 for(ForkJoinSolver fork : tmpFork){
                     try {
                         List<Integer> tmpResult = fork.join();
                         if(tmpResult != null){
-                            print("Path found");
                             return tmpResult;
                         }
                     }
@@ -138,6 +131,11 @@ public class ForkJoinSolver extends SequentialSolver
             return true;
         }
         return false;
+    }
+
+    private void addFork(ForkJoinTask<List<Integer>> aFork){
+        if(sForkPool == null){ sForkPool = new ForkJoinPool(); }
+        sForkPool.submit(aFork);
     }
 
     private void delay(final long aDelay){
