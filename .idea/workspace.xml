@@ -14,24 +14,24 @@
     <splitter split-orientation="horizontal" split-proportion="0.5">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="Main.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/amazed/Main.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="299">
-                  <caret line="74" column="8" lean-forward="false" selection-start-line="74" selection-start-column="8" selection-end-line="74" selection-end-column="8" />
+                <state relative-caret-position="333">
+                  <caret line="75" column="41" lean-forward="false" selection-start-line="75" selection-start-column="41" selection-end-line="75" selection-end-column="41" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="ForkJoinSolver.java" pinned="false" current-in-tab="false">
+          <file leaf-file-name="ForkJoinSolver.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/amazed/solver/ForkJoinSolver.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="401">
-                  <caret line="123" column="27" lean-forward="true" selection-start-line="123" selection-start-column="27" selection-end-line="123" selection-end-column="27" />
+                <state relative-caret-position="289">
+                  <caret line="85" column="35" lean-forward="true" selection-start-line="85" selection-start-column="35" selection-end-line="85" selection-end-column="35" />
                   <folding>
-                    <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-                    <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
+                    <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+                    <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
                   </folding>
                 </state>
               </provider>
@@ -93,8 +93,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/main/amazed/solver/SequentialSolver.java" />
-        <option value="$PROJECT_DIR$/src/main/amazed/solver/ForkJoinSolver.java" />
         <option value="$PROJECT_DIR$/src/main/amazed/Main.java" />
+        <option value="$PROJECT_DIR$/src/main/amazed/solver/ForkJoinSolver.java" />
       </list>
     </option>
   </component>
@@ -353,8 +353,8 @@
         <state relative-caret-position="1530">
           <caret line="100" column="17" lean-forward="false" selection-start-line="100" selection-start-column="17" selection-end-line="100" selection-end-column="17" />
           <folding>
-            <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-            <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
+            <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+            <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -406,8 +406,8 @@
         <state relative-caret-position="1530">
           <caret line="100" column="17" lean-forward="true" selection-start-line="100" selection-start-column="17" selection-end-line="100" selection-end-column="17" />
           <folding>
-            <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-            <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
+            <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+            <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -459,8 +459,8 @@
         <state relative-caret-position="1309">
           <caret line="87" column="32" lean-forward="true" selection-start-line="87" selection-start-column="32" selection-end-line="87" selection-end-column="32" />
           <folding>
-            <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-            <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
+            <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+            <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -512,8 +512,8 @@
         <state relative-caret-position="2210">
           <caret line="140" column="5" lean-forward="true" selection-start-line="140" selection-start-column="5" selection-end-line="140" selection-end-column="5" />
           <folding>
-            <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-            <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
+            <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+            <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -565,8 +565,8 @@
         <state relative-caret-position="1632">
           <caret line="106" column="58" lean-forward="true" selection-start-line="106" selection-start-column="58" selection-end-line="106" selection-end-column="58" />
           <folding>
-            <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-            <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
+            <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+            <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -611,8 +611,8 @@
         <state relative-caret-position="1326">
           <caret line="85" column="92" lean-forward="true" selection-start-line="85" selection-start-column="92" selection-end-line="85" selection-end-column="92" />
           <folding>
-            <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-            <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
+            <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+            <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -638,8 +638,8 @@
         <state relative-caret-position="1088">
           <caret line="71" column="68" lean-forward="false" selection-start-line="71" selection-start-column="68" selection-end-line="71" selection-end-column="68" />
           <folding>
-            <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-            <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
+            <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+            <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -687,8 +687,8 @@
         <state relative-caret-position="1734">
           <caret line="109" column="32" lean-forward="true" selection-start-line="109" selection-start-column="32" selection-end-line="109" selection-end-column="32" />
           <folding>
-            <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-            <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
+            <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+            <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
           </folding>
         </state>
       </provider>
@@ -756,22 +756,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/amazed/solver/ForkJoinSolver.java">
+    <entry file="file://$PROJECT_DIR$/src/main/amazed/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="123" column="27" lean-forward="true" selection-start-line="123" selection-start-column="27" selection-end-line="123" selection-end-column="27" />
-          <folding>
-            <marker date="1508616633037" expanded="false" signature="4621:4631" ph=" { " />
-            <marker date="1508616633037" expanded="false" signature="4657:4663" ph=" }" />
-          </folding>
+        <state relative-caret-position="333">
+          <caret line="75" column="41" lean-forward="false" selection-start-line="75" selection-start-column="41" selection-end-line="75" selection-end-column="41" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/amazed/Main.java">
+    <entry file="file://$PROJECT_DIR$/src/main/amazed/solver/ForkJoinSolver.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="74" column="8" lean-forward="false" selection-start-line="74" selection-start-column="8" selection-end-line="74" selection-end-column="8" />
-          <folding />
+        <state relative-caret-position="289">
+          <caret line="85" column="35" lean-forward="true" selection-start-line="85" selection-start-column="35" selection-end-line="85" selection-end-column="35" />
+          <folding>
+            <marker date="1508617941748" expanded="false" signature="4683:4693" ph=" { " />
+            <marker date="1508617941748" expanded="false" signature="4719:4725" ph=" }" />
+          </folding>
         </state>
       </provider>
     </entry>

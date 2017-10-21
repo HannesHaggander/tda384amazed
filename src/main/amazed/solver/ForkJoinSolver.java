@@ -100,8 +100,9 @@ public class ForkJoinSolver extends SequentialSolver
                     ForkJoinSolver tmpSolver = new ForkJoinSolver(maze);
                     tmpSolver.moveTo = neighbour;
                     tmpFork.add(tmpSolver);
-                    addFork(tmpSolver.fork());
+                    addForkToPool(tmpSolver.fork());
                 }
+
                 for(ForkJoinSolver fork : tmpFork){
                     try {
                         List<Integer> tmpResult = fork.join();
@@ -110,6 +111,7 @@ public class ForkJoinSolver extends SequentialSolver
                         }
                     }
                     catch (Exception ex){
+                        print("Failed to join");
                         continue;
                     }
                 }
@@ -133,7 +135,7 @@ public class ForkJoinSolver extends SequentialSolver
         return false;
     }
 
-    private void addFork(ForkJoinTask<List<Integer>> aFork){
+    private void addForkToPool(ForkJoinTask<List<Integer>> aFork){
         if(sForkPool == null){ sForkPool = new ForkJoinPool(); }
         sForkPool.submit(aFork);
     }

@@ -72,9 +72,8 @@ public class Main
     public static void main(String[] args)
     throws InterruptedException
     {
-        
         //parseArguments(args);
-        Amazed amazed = new Amazed(smallMap, sSequential, sForkAfter, sPeriodMS);
+        Amazed amazed = new Amazed(bigMap, sSequential, sForkAfter, sPeriodMS);
         long start = System.currentTimeMillis();
         amazed.solve();
         long stop = System.currentTimeMillis();
