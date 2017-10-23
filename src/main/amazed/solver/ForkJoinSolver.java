@@ -63,81 +63,71 @@ public class ForkJoinSolver extends SequentialSolver
 
     int playerID;
     int currentPosition;
-    int moveTo = -1;
-    int startPos;
+    int remoteStart;
+    boolean forked = false;
 
-    public static ForkJoinPool sForkPool = null;
-    public static ConcurrentSkipListSet<Integer> visitedList = null;
+    public volatile Set<ForkJoinSolver> activePlayers = null;
+    //public volatile Set<Integer> visitedList = null;
+    public static Set<Integer> visitedList = null;
 
-    private List<Integer> parallelDepthFirstSearch() {
-        startPos = moveTo > 0 ? moveTo : start;
-        if(maze.hasGoal(start)){
-            List<Integer> tmpList = new ArrayList<>();
-            tmpList.add(start);
-            return tmpList;
-        }
+    private synchronized List<Integer> parallelDepthFirstSearch() {
+        init();
+        int startPos = forked ? remoteStart : start;
 
-        if(getVisited().contains(startPos)){ return null; }
+        print(String.format("Start pos: %s | Active Players: %s | Visited size: %s",
+                startPos,
+                activePlayers.size(),
+                visitedList.size()
+        ));
 
+        // start new player
         playerID = maze.newPlayer(startPos);
-        addToVisited(startPos);
-        if(frontier.isEmpty()){ frontier.push(startPos); }
+        frontier.push(startPos);
 
         while(!frontier.isEmpty()){
             currentPosition = frontier.pop();
+
             if(maze.hasGoal(currentPosition)){
-                //maze.move(playerID, currentPosition);
+                print(String.format("Found goal: Start: %s | end: %s", start, currentPosition));
+                maze.move(playerID, currentPosition);
                 return pathFromTo(start, currentPosition);
             }
 
-            Set<Integer> tmpNeighbour = maze.neighbors(currentPosition);
-            for(int neighbour : tmpNeighbour){
-                List<ForkJoinSolver> tmpFork = new ArrayList<>();
-                if(!getVisited().contains(neighbour)){
-                    frontier.push(neighbour);
-                    addToVisited(neighbour);
-                    predecessor.put(neighbour, currentPosition);
-                    ForkJoinSolver tmpSolver = new ForkJoinSolver(maze);
-                    tmpSolver.moveTo = neighbour;
-                    tmpFork.add(tmpSolver);
-                    addForkToPool(tmpSolver.fork());
-                }
+            maze.move(playerID, currentPosition);
+            Set<Integer> neighbours = maze.neighbors(currentPosition);
 
-                for(ForkJoinSolver fork : tmpFork){
-                    try {
-                        List<Integer> tmpResult = fork.join();
-                        if(tmpResult != null){
-                            return tmpResult;
-                        }
-                    }
-                    catch (Exception ex){
-                        print("Failed to join");
-                        continue;
-                    }
+            for(int n : neighbours){
+                if(!visitedList.contains(n)){
+                    ForkJoinSolver tmpSolver = new ForkJoinSolver(maze, this.forkAfter);
+                    activePlayers.add(tmpSolver);
+                    predecessor.put(n, currentPosition);
+                    visitedList.add(n);
+                    tmpSolver.frontier = this.frontier;
+                    tmpSolver.remoteStart = n;
+                    tmpSolver.forked = true;
+                    tmpSolver.predecessor = this.predecessor;
                 }
+            }
+
+            for(ForkJoinSolver tmp : activePlayers){
+                //print("Forked");
+                ForkJoinPool.commonPool().submit(tmp.fork());
+            }
+            for(ForkJoinSolver tmp : activePlayers){
+                try{
+                    List<Integer> path = tmp.join();
+                    if(path != null){ return path; }
+                }
+                catch (Exception ex){ err("Error: " + ex.getLocalizedMessage(), ex); }
             }
         }
 
         return null;
     }
 
-    private static ConcurrentSkipListSet<Integer> getVisited(){
-        if(visitedList == null){ visitedList = new ConcurrentSkipListSet<>(); }
-        return visitedList;
-    }
-
-    public static boolean addToVisited(int node){
-        getVisited();
-        if(!visitedList.contains(node)){
-            visitedList.add(node);
-            return true;
-        }
-        return false;
-    }
-
-    private void addForkToPool(ForkJoinTask<List<Integer>> aFork){
-        if(sForkPool == null){ sForkPool = new ForkJoinPool(); }
-        sForkPool.submit(aFork);
+    private void init(){
+        if(activePlayers == null){ activePlayers = new HashSet<>(); }
+        if(visitedList == null){ visitedList = new HashSet<>(); }
     }
 
     private void delay(final long aDelay){
