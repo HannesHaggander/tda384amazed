@@ -65,6 +65,7 @@ public class ForkJoinSolver extends SequentialSolver
     int currentPosition;
     int remoteStart;
     boolean forked = false;
+    int currentForkAfterCounter = 0;
 
     public volatile Set<ForkJoinSolver> activePlayers = null;
     //public volatile Set<Integer> visitedList = null;
@@ -82,7 +83,7 @@ public class ForkJoinSolver extends SequentialSolver
 
         // start new player
         playerID = maze.newPlayer(startPos);
-        frontier.push(startPos);
+        if(!frontier.contains(startPos)){ frontier.push(startPos); }
 
         while(!frontier.isEmpty()){
             currentPosition = frontier.pop();
@@ -98,21 +99,32 @@ public class ForkJoinSolver extends SequentialSolver
 
             for(int n : neighbours){
                 if(!visitedList.contains(n)){
-                    ForkJoinSolver tmpSolver = new ForkJoinSolver(maze, this.forkAfter);
-                    activePlayers.add(tmpSolver);
                     predecessor.put(n, currentPosition);
                     visitedList.add(n);
-                    tmpSolver.frontier = this.frontier;
-                    tmpSolver.remoteStart = n;
-                    tmpSolver.forked = true;
-                    tmpSolver.predecessor = this.predecessor;
+                    frontier.push(n);
+                    currentForkAfterCounter += 1;
+                    if(this.forkAfter == 0){
+                        print("Dont fork now");
+                    }
+                    else if(currentForkAfterCounter % (this.forkAfter + 1) == 0){
+                        print("fork now");
+                        ForkJoinSolver tmpSolver = new ForkJoinSolver(maze, this.forkAfter);
+                        activePlayers.add(tmpSolver);
+                        tmpSolver.frontier = this.frontier;
+                        tmpSolver.remoteStart = n;
+                        tmpSolver.forked = true;
+                        tmpSolver.predecessor = this.predecessor;
+                        tmpSolver.currentForkAfterCounter = this.currentForkAfterCounter + 1;
+                    }
                 }
             }
 
+            print("Ok fork now");
             for(ForkJoinSolver tmp : activePlayers){
                 //print("Forked");
                 ForkJoinPool.commonPool().submit(tmp.fork());
             }
+
             for(ForkJoinSolver tmp : activePlayers){
                 try{
                     List<Integer> path = tmp.join();

@@ -25,7 +25,7 @@ public class Main
 
     private static String map;
     private static boolean sequential = true;
-    private static int forkAfter = 0;
+    private static int forkAfter = 1;
     private static int period = 500;
 
     private static void parseArguments(String[] args)
@@ -66,14 +66,14 @@ public class Main
     private static final String bigMap = ".\\maps\\medium.map";
     private static final String smallMap = ".\\maps\\small.map";
     private static final boolean sSequential = false;
-    private static final int sForkAfter = 5;
+    private static final int sForkAfter = 3;
     private static final int sPeriodMS = 150;
 
     public static void main(String[] args)
     throws InterruptedException
     {
         //parseArguments(args);
-        Amazed amazed = new Amazed(bigMap, sSequential, sForkAfter, sPeriodMS);
+        Amazed amazed = new Amazed(smallMap, sSequential, sForkAfter, sPeriodMS);
         long start = System.currentTimeMillis();
         amazed.solve();
         long stop = System.currentTimeMillis();
