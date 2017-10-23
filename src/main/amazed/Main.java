@@ -67,7 +67,7 @@ public class Main
     private static final String smallMap = ".\\maps\\small.map";
     private static final boolean sSequential = false;
     private static final int sForkAfter = 5;
-    private static final int sPeriodMS = 10;
+    private static final int sPeriodMS = 150;
 
     public static void main(String[] args)
     throws InterruptedException

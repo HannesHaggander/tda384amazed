@@ -74,11 +74,11 @@ public class ForkJoinSolver extends SequentialSolver
         init();
         int startPos = forked ? remoteStart : start;
 
-        print(String.format("Start pos: %s | Active Players: %s | Visited size: %s",
-                startPos,
-                activePlayers.size(),
-                visitedList.size()
-        ));
+//        print(String.format("Start pos: %s | Active Players: %s | Visited size: %s",
+//                startPos,
+//                activePlayers.size(),
+//                visitedList.size()
+//        ));
 
         // start new player
         playerID = maze.newPlayer(startPos);
