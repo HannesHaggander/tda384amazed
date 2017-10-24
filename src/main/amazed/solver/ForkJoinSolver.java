@@ -68,7 +68,6 @@ public class ForkJoinSolver extends SequentialSolver
 
     public volatile Set<ForkJoinSolver> activePlayers = null;
     //public volatile Set<Integer> visitedList = null;
-    public static Set<Integer> visitedList = null;
 
     private synchronized List<Integer> parallelDepthFirstSearch() {
         init();
@@ -97,21 +96,21 @@ public class ForkJoinSolver extends SequentialSolver
             Set<Integer> neighbours = maze.neighbors(currentPosition);
 
             for(int n : neighbours){
-                if(!visitedList.contains(n)){
+                if(visited.add(n)){
                     ForkJoinSolver tmpSolver = new ForkJoinSolver(maze, this.forkAfter);
                     activePlayers.add(tmpSolver);
                     predecessor.put(n, currentPosition);
-                    visitedList.add(n);
-                    tmpSolver.frontier = this.frontier;
+                    visited.add(n);
                     tmpSolver.remoteStart = n;
                     tmpSolver.forked = true;
                     tmpSolver.predecessor = this.predecessor;
+                    tmpSolver.visited = this.visited;
                 }
             }
 
             for(ForkJoinSolver tmp : activePlayers){
                 //print("Forked");
-                ForkJoinPool.commonPool().submit(tmp.fork());
+                tmp.fork();
             }
             for(ForkJoinSolver tmp : activePlayers){
                 try{
@@ -127,7 +126,10 @@ public class ForkJoinSolver extends SequentialSolver
 
     private void init(){
         if(activePlayers == null){ activePlayers = new HashSet<>(); }
-        if(visitedList == null){ visitedList = new HashSet<>(); }
+        if(!(visited instanceof ConcurrentSkipListSet) && visited.isEmpty()){
+            print("Visited is now concurrent skip set");
+            visited = new ConcurrentSkipListSet<>();
+        }
     }
 
     private void delay(final long aDelay){
