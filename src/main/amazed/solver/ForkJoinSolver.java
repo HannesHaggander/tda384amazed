@@ -70,7 +70,7 @@ public class ForkJoinSolver extends SequentialSolver
 
     private Set<ForkJoinSolver> activePlayers = new HashSet<>();
 
-    private synchronized List<Integer> parallelDepthFirstSearch() {
+    private List<Integer> parallelDepthFirstSearch() {
         init();
         // if forked, then start on another location rather than moving there
         int startPos = forked ? remoteStart : start;

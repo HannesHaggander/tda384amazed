@@ -17,8 +17,8 @@
           <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/amazed/Main.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1139">
-                  <caret line="69" column="44" lean-forward="false" selection-start-line="69" selection-start-column="44" selection-end-line="69" selection-end-column="44" />
+                <state relative-caret-position="289">
+                  <caret line="70" column="0" lean-forward="true" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -37,10 +37,10 @@
           <file leaf-file-name="ForkJoinSolver.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/amazed/solver/ForkJoinSolver.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-24">
-                  <caret line="106" column="70" lean-forward="false" selection-start-line="106" selection-start-column="70" selection-end-line="106" selection-end-column="70" />
+                <state relative-caret-position="289">
+                  <caret line="82" column="35" lean-forward="true" selection-start-line="82" selection-start-column="35" selection-end-line="82" selection-end-column="35" />
                   <folding>
-                    <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+                    <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
                   </folding>
                 </state>
               </provider>
@@ -53,8 +53,8 @@
           <file leaf-file-name="SequentialSolver.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/amazed/solver/SequentialSolver.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="150">
-                  <caret line="61" column="33" lean-forward="false" selection-start-line="61" selection-start-column="26" selection-end-line="61" selection-end-column="33" />
+                <state relative-caret-position="201">
+                  <caret line="64" column="0" lean-forward="true" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
@@ -105,8 +105,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/main/amazed/solver/SequentialSolver.java" />
-        <option value="$PROJECT_DIR$/src/main/amazed/Main.java" />
         <option value="$PROJECT_DIR$/src/main/amazed/solver/ForkJoinSolver.java" />
+        <option value="$PROJECT_DIR$/src/main/amazed/Main.java" />
       </list>
     </option>
   </component>
@@ -358,7 +358,7 @@
         <state relative-caret-position="1530">
           <caret line="100" column="17" lean-forward="false" selection-start-line="100" selection-start-column="17" selection-end-line="100" selection-end-column="17" />
           <folding>
-            <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+            <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -410,7 +410,7 @@
         <state relative-caret-position="1530">
           <caret line="100" column="17" lean-forward="true" selection-start-line="100" selection-start-column="17" selection-end-line="100" selection-end-column="17" />
           <folding>
-            <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+            <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -462,7 +462,7 @@
         <state relative-caret-position="1309">
           <caret line="87" column="32" lean-forward="true" selection-start-line="87" selection-start-column="32" selection-end-line="87" selection-end-column="32" />
           <folding>
-            <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+            <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -514,7 +514,7 @@
         <state relative-caret-position="2210">
           <caret line="140" column="5" lean-forward="true" selection-start-line="140" selection-start-column="5" selection-end-line="140" selection-end-column="5" />
           <folding>
-            <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+            <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -566,7 +566,7 @@
         <state relative-caret-position="1632">
           <caret line="106" column="58" lean-forward="true" selection-start-line="106" selection-start-column="58" selection-end-line="106" selection-end-column="58" />
           <folding>
-            <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+            <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -611,7 +611,7 @@
         <state relative-caret-position="1326">
           <caret line="85" column="92" lean-forward="true" selection-start-line="85" selection-start-column="92" selection-end-line="85" selection-end-column="92" />
           <folding>
-            <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+            <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -637,7 +637,7 @@
         <state relative-caret-position="1088">
           <caret line="71" column="68" lean-forward="false" selection-start-line="71" selection-start-column="68" selection-end-line="71" selection-end-column="68" />
           <folding>
-            <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+            <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -685,7 +685,7 @@
         <state relative-caret-position="1734">
           <caret line="109" column="32" lean-forward="true" selection-start-line="109" selection-start-column="32" selection-end-line="109" selection-end-column="32" />
           <folding>
-            <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+            <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -744,14 +744,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/amazed/solver/SequentialSolver.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="61" column="33" lean-forward="false" selection-start-line="61" selection-start-column="26" selection-end-line="61" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/amazed/maze/Amazed.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="702">
@@ -760,20 +752,28 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/amazed/solver/SequentialSolver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="64" column="0" lean-forward="true" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/amazed/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1139">
-          <caret line="69" column="44" lean-forward="false" selection-start-line="69" selection-start-column="44" selection-end-line="69" selection-end-column="44" />
+        <state relative-caret-position="289">
+          <caret line="70" column="0" lean-forward="true" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/amazed/solver/ForkJoinSolver.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-24">
-          <caret line="106" column="70" lean-forward="false" selection-start-line="106" selection-start-column="70" selection-end-line="106" selection-end-column="70" />
+        <state relative-caret-position="289">
+          <caret line="82" column="35" lean-forward="true" selection-start-line="82" selection-start-column="35" selection-end-line="82" selection-end-column="35" />
           <folding>
-            <marker date="1508871198690" expanded="true" signature="4909:5246" ph="{...}" />
+            <marker date="1508872399721" expanded="true" signature="4896:5233" ph="{...}" />
           </folding>
         </state>
       </provider>
