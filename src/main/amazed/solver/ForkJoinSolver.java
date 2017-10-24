@@ -61,15 +61,18 @@ public class ForkJoinSolver extends SequentialSolver
         return parallelDepthFirstSearch();
     }
 
-    int playerID;
-    int currentPosition;
-    int remoteStart;
-    boolean forked = false;
+    protected int playerID;
+    protected int currentPosition;
+    protected int remoteStart;
+    protected boolean forked = false;
+    protected int steps = 0;
+    protected boolean forkWhenAvailable = false;
 
-    public volatile Set<ForkJoinSolver> activePlayers = new HashSet<>();
+    private Set<ForkJoinSolver> activePlayers = new HashSet<>();
 
     private synchronized List<Integer> parallelDepthFirstSearch() {
         init();
+        // if forked, then start on another location rather than moving there
         int startPos = forked ? remoteStart : start;
 
         visited.add(startPos);
@@ -80,41 +83,59 @@ public class ForkJoinSolver extends SequentialSolver
         while(!frontier.isEmpty()){
             currentPosition = frontier.pop();
 
+            // check if the current node is the goal node
             if(maze.hasGoal(currentPosition)){
                 maze.move(playerID, currentPosition);
                 return pathFromTo(start, currentPosition);
             }
 
+            // get all available neighbours to the current node (includes visited ones)
             Set<Integer> neighbours = maze.neighbors(currentPosition);
 
+            // Extract all the visited nodes from the current neighbour set
+            // if the visited list does not contain the visited node then add it to
+            // the list and add it to predecessor
             Set<Integer> nonVisited = new HashSet<>();
             for(int n : neighbours){
                 if(visited.add(n)){
                     predecessor.put(n, currentPosition);
-                    visited.add(n);
                     nonVisited.add(n);
                 }
             }
 
+            // only allow forking after a certain amount of steps
+            // we only need to fork when there are multiple neighbours
+            steps += 1;
+            if(forkAfter > 0 && steps % (forkAfter) == 0){ forkWhenAvailable = true; }
+
             for(int n : nonVisited){
-                if(nonVisited.size() == 1){
-                    maze.move(playerID, n);
-                    frontier.push(n);
-                }
-                else {
+                if(nonVisited.isEmpty()){ break; }
+                // only fork when there are multiple neighbours
+                if(nonVisited.size() > 1 && forkWhenAvailable) {
                     ForkJoinSolver tmpSolver = new ForkJoinSolver(maze, this.forkAfter);
                     activePlayers.add(tmpSolver);
                     tmpSolver.remoteStart = n;
                     tmpSolver.forked = true;
                     tmpSolver.predecessor = this.predecessor;
                     tmpSolver.visited = this.visited;
+                    tmpSolver.steps = this.steps;
+                }
+                else {
+                    // if there only is one neighbour then move to it rather than forking
+                    maze.move(playerID, n);
+                    frontier.push(n);
                 }
             }
 
+            // if some threads have been spawned, then reset the fork when available value
+            if(!activePlayers.isEmpty()){ forkWhenAvailable = false; }
+
+            // fork all instances
             for(ForkJoinSolver tmp : activePlayers){
-                //print("Forked");
                 tmp.fork();
             }
+
+            //join up all instances in hopes that one of the children found a path to the goal
             for(ForkJoinSolver tmp : activePlayers){
                 try{
                     List<Integer> path = tmp.join();
@@ -127,6 +148,10 @@ public class ForkJoinSolver extends SequentialSolver
         return null;
     }
 
+    /**
+     * Make the visited list a concurrent safe list if its not.
+     * Also make the predecessor concurrent safe if its not.
+     */
     private void init(){
         if(!(visited instanceof ConcurrentSkipListSet) && visited.isEmpty()){
             visited = new ConcurrentSkipListSet<>();

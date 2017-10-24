@@ -66,7 +66,7 @@ public class Main
     private static final String bigMap = ".\\maps\\medium.map";
     private static final String smallMap = ".\\maps\\small.map";
     private static final boolean sSequential = false;
-    private static final int sForkAfter = 5;
+    private static final int sForkAfter = 4;
     private static final int sPeriodMS = 100;
 
     public static void main(String[] args)
