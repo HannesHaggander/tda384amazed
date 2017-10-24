@@ -81,16 +81,8 @@ public class ForkJoinSolver extends SequentialSolver
             currentPosition = frontier.pop();
 
             if(maze.hasGoal(currentPosition)){
-                print(String.format("Found goal: Start: %s | end: %s", start, currentPosition));
                 maze.move(playerID, currentPosition);
-                List<Integer> finalPath = pathFromTo(start, currentPosition);
-                StringBuilder sb = new StringBuilder();
-                sb.append("Path: ");
-                for(int i : finalPath){
-                    sb.append(String.format("%s, ", i));
-                }
-                print(sb.toString());
-                return finalPath;
+                return pathFromTo(start, currentPosition);
             }
 
             Set<Integer> neighbours = maze.neighbors(currentPosition);
