@@ -1,0 +1,17 @@
+Lab 3 - A-mazed description 
+Hannes Häggander
+Fire Group 65
+--
+
+The Fork join solver starts off by making sure that the visited and the predecessor data structures are concurrent safe data structures. The visited sets desired type is an "Concurrent Skip List Set" and the predecessor sets desired type is a "Concurrent Skip List Map" to allow alterations from different threads.
+
+Every instance of any ForkJoinSolver has a player connected to it. The player starts at a defined start node.
+When the player is spawned the start node becomes the current node. 
+If the current node is the goal node then the process will stop and the path to the current node from the start node will be the path solution. If the current node is not the goal; all neighbour nodes are processed. If an adjacent node to the current node is not yet visited, by any player, then add the node to visited. The path to the neighbour from the current node is stored in the predecessor map for future use and finally the unvisited node are added to the "non visited" set.
+
+Once all the available neighbour nodes have been added to the non visited set the set size is evaluated.
+If the non visited set is 0, then do nothing as there are no available neighbours to the node.
+Should the set only contain one element the current player moves to that node and repeats the neighbour checking process.
+If there are more than one neighbour the and "fork after" allows for forking, then the workload is split up. The split up process is done by making a new instance of the ForkJoinSolver and passing along relevant data to the new instance. Relevant data is the pointer to the visited set, a pointer to the predecessor map, and the starting position of the new instances new player. The new instance is then saved to a set for later use.
+
+When the newly created instances have been forked they are joined in hopes that the fork or any of its children has found a path to the goal. If a player/fork finds a path to the goal, the solution is passed up the hierarchy and finally returned by the root ForkJoinSolver.
