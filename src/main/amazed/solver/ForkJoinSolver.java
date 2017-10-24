@@ -66,19 +66,13 @@ public class ForkJoinSolver extends SequentialSolver
     int remoteStart;
     boolean forked = false;
 
-    public volatile Set<ForkJoinSolver> activePlayers = null;
-    //public volatile Set<Integer> visitedList = null;
+    public volatile Set<ForkJoinSolver> activePlayers = new HashSet<>();
 
     private synchronized List<Integer> parallelDepthFirstSearch() {
         init();
         int startPos = forked ? remoteStart : start;
 
-//        print(String.format("Start pos: %s | Active Players: %s | Visited size: %s",
-//                startPos,
-//                activePlayers.size(),
-//                visitedList.size()
-//        ));
-
+        visited.add(startPos);
         // start new player
         playerID = maze.newPlayer(startPos);
         frontier.push(startPos);
@@ -89,18 +83,35 @@ public class ForkJoinSolver extends SequentialSolver
             if(maze.hasGoal(currentPosition)){
                 print(String.format("Found goal: Start: %s | end: %s", start, currentPosition));
                 maze.move(playerID, currentPosition);
-                return pathFromTo(start, currentPosition);
+                List<Integer> finalPath = pathFromTo(start, currentPosition);
+                StringBuilder sb = new StringBuilder();
+                sb.append("Path: ");
+                for(int i : finalPath){
+                    sb.append(String.format("%s, ", i));
+                }
+                print(sb.toString());
+                return finalPath;
             }
 
-            maze.move(playerID, currentPosition);
             Set<Integer> neighbours = maze.neighbors(currentPosition);
 
+            Set<Integer> nonVisited = new HashSet<>();
             for(int n : neighbours){
                 if(visited.add(n)){
-                    ForkJoinSolver tmpSolver = new ForkJoinSolver(maze, this.forkAfter);
-                    activePlayers.add(tmpSolver);
                     predecessor.put(n, currentPosition);
                     visited.add(n);
+                    nonVisited.add(n);
+                }
+            }
+
+            for(int n : nonVisited){
+                if(nonVisited.size() == 1){
+                    maze.move(playerID, n);
+                    frontier.push(n);
+                }
+                else {
+                    ForkJoinSolver tmpSolver = new ForkJoinSolver(maze, this.forkAfter);
+                    activePlayers.add(tmpSolver);
                     tmpSolver.remoteStart = n;
                     tmpSolver.forked = true;
                     tmpSolver.predecessor = this.predecessor;
@@ -125,16 +136,12 @@ public class ForkJoinSolver extends SequentialSolver
     }
 
     private void init(){
-        if(activePlayers == null){ activePlayers = new HashSet<>(); }
         if(!(visited instanceof ConcurrentSkipListSet) && visited.isEmpty()){
-            print("Visited is now concurrent skip set");
             visited = new ConcurrentSkipListSet<>();
         }
-    }
-
-    private void delay(final long aDelay){
-        try { Thread.sleep(aDelay); }
-        catch (Exception ex){}
+        if(!(predecessor instanceof ConcurrentSkipListMap) && predecessor.isEmpty()){
+            predecessor = new ConcurrentSkipListMap<>();
+        }
     }
 
     /**
